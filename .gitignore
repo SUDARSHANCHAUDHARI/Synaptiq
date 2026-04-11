@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment — never commit real keys
+.env
+
+# Planning / spec docs — keep off public repo
+synaptiq_full_setup.md
+PLAN_*.md
+SPEC_*.md
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
