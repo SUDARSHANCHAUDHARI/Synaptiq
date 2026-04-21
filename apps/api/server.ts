@@ -9,7 +9,17 @@ import "dotenv/config";
 
 const app = Fastify({ logger: true });
 const port = Number(process.env.PORT) || 3001;
-const webhookApiKey = process.env.WEBHOOK_API_KEY || "";
+const webhookApiKey = (process.env.WEBHOOK_API_KEY ?? "").trim();
+
+if (!webhookApiKey) {
+  // Fail closed — starting without a webhook API key is a misconfiguration.
+  // Any request to /webhook/run would be unauthenticated, so we refuse to start.
+  console.error(
+    "[FATAL] WEBHOOK_API_KEY is not set or is empty. " +
+    "Set a strong secret in your environment before starting the API."
+  );
+  process.exit(1);
+}
 
 const queue = new Queue("agent", {
   connection: {
@@ -50,8 +60,8 @@ app.post("/run", async (req: any, reply) => {
 });
 
 app.post("/webhook/run", async (req: any, reply) => {
-  const providedKey = String(req.headers["x-api-key"] || "");
-  if (webhookApiKey && providedKey !== webhookApiKey) {
+  const providedKey = String(req.headers["x-api-key"] || "").trim();
+  if (providedKey !== webhookApiKey) {
     return reply.code(401).send({ error: "Invalid API key" });
   }
 
