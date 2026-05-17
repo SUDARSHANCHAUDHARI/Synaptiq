@@ -22,3 +22,6 @@ SPEC_*.md
 .vscode/
 .idea/
 PLAN.md
+
+# graphify knowledge graph
+graphify-out/
