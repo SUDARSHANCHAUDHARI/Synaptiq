@@ -53,10 +53,11 @@ synaptiq/
 Copy `.env.example` and provide values for:
 
 ```env
-OPENAI_API_KEY=
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/synaptiq
 REDIS_HOST=localhost
 REDIS_PORT=6379
+WEBHOOK_API_KEY=YOUR_WEBHOOK_API_KEY
 ```
 
 ## Database
