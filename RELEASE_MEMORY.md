@@ -42,3 +42,4 @@ Run `pnpm check`, then local API/worker smoke test with docker-compose services.
 
 - Updated `.env.example` and README environment examples to use `YOUR_OPENAI_API_KEY` and `YOUR_WEBHOOK_API_KEY`.
 - Current release type remains POC/internal demo until build, Postgres/Redis smoke, auth, rate limits, and deployment monitoring are complete.
+- Polished README with POC/internal status, technical decisions, setup, verification, known limits, and production blockers.
