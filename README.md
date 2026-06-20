@@ -3,11 +3,11 @@
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](package.json)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6.svg)](https://www.typescriptlang.org/)
 [![Fastify](https://img.shields.io/badge/Fastify-4-black.svg)](https://fastify.dev/)
-[![Release](https://img.shields.io/badge/release-POC%20internal%20demo-orange.svg)](RELEASE_MEMORY.md)
+[![Status](https://img.shields.io/badge/status-skeleton%20%2B%20hardened%20foundations-yellow.svg)](RELEASE_MEMORY.md)
 
 AI agent debugging and cost-tracking backend with Fastify API, BullMQ worker, PostgreSQL audit storage, Redis queues, and OpenAI-powered loop-fix concepts.
 
-> **Status:** POC/internal demo · not production-ready until build pipeline, auth, rate limits, Postgres/Redis smoke, and monitoring are complete
+> **Status:** Working skeleton with hardened foundations — fail-closed webhook auth, typed PostgreSQL audit log, graceful shutdown, Docker Compose for Postgres/Redis, and an 11-test Vitest suite covering the cost tracker and loop detector. The end-to-end path (create run → enqueue → worker executes → audit row written) needs a live integration smoke test against the Compose stack, and rate limits / observability are still TODO before treating this as a production service.
 
 ## Why This Exists
 
@@ -17,11 +17,13 @@ AI agent runs can loop, waste tokens, and fail without clear execution traces. S
 
 | Item | State |
 |---|---|
-| Release type | POC/internal demo |
+| Release type | Skeleton with hardened foundations |
 | Runtime | ts-node TypeScript |
 | Queue | Redis + BullMQ |
 | Database | PostgreSQL schema included |
-| Production | Pending auth/rate limits/deployment |
+| Security | Webhook fail-closed without `WEBHOOK_API_KEY`; bearer header check on `/webhook/run` |
+| Tests | 11 Vitest unit tests (cost tracker, loop detector) |
+| Remaining | End-to-end smoke against Compose stack; rate limits; observability |
 
 ## Key Technical Decisions
 
