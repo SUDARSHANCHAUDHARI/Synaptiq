@@ -42,3 +42,50 @@
 ## Deployment
 
 Not yet deployed. `docker-compose.yml` is ready for Postgres + Redis + the app on any container host.
+
+## File-by-file checklist
+
+### API (`apps/api/`)
+- [x] `server.ts` — Fastify API with `/run`, `/webhook/run`, `/runs`, `/runs/:id`, `/health`, static UI at `/` and `/runs/view/:id`. Fail-closed on missing `WEBHOOK_API_KEY`. Graceful shutdown.
+
+### Worker (`services/worker/`)
+- [x] `worker.ts` — BullMQ worker with exponential backoff retry
+
+### Agent engine (`services/agent-engine/`)
+- [~] `runAgent.ts` — `createQueuedRun()` exists; **actual execution loop is thin** (needs flesh-out)
+
+### Packages
+- [x] `packages/llm/openai.ts` — OpenAI client wrapper
+- [x] `packages/cost/tracker.ts` — `calcCost()` for prompt vs completion tokens
+- [x] `packages/audit/logger.ts` — `logStep()` writes to `steps` table
+- [x] `packages/review/reviewer.ts` — review surface (skeleton)
+- [x] `packages/db/index.ts` — `pg` Pool + `initDb`/`closeDb`
+- [x] `packages/loop/detector.ts` — Jaccard ≥ 0.85 loop detection
+- [x] `packages/loop/fixer.ts` — LLM-driven loop fix (skeleton; depends on `callLLM`)
+
+### Web UI (`apps/web/`)
+- [x] `index.html`, `run.html` — static UI served by API
+
+### Infra (`infra/`)
+- [x] `docker-compose.yml` — Postgres + Redis + app
+
+### Tests
+- [x] `packages/cost/tracker.test.ts` — 4 tests
+- [x] `packages/loop/detector.test.ts` — 7 tests (including the 0.85 Jaccard threshold edge case)
+
+### Tooling
+- [x] `tsconfig.json` — `skipLibCheck: true` (modern default) to avoid vitest transitive Vite type breakage
+- [x] Complete `.env.example` covering all 6 env vars
+- [x] `vitest.config.ts`
+
+### Quality
+- [x] Typecheck green
+- [x] 11 tests pass
+
+### Not done
+- [ ] **Live end-to-end smoke** against the Compose stack (create run → enqueue → worker executes → audit row written → loop detector trips on repeat)
+- [ ] **Rate limiting** on `/run` and `/webhook/run`
+- [ ] **Observability** — structured logging, Prometheus metrics, traces
+- [ ] Flesh out `services/agent-engine/runAgent.ts` — actual agent execution loop
+- [ ] Flesh out `packages/loop/fixer.ts` and `packages/review/reviewer.ts`
+- [ ] API integration tests (only pure helpers tested so far)
