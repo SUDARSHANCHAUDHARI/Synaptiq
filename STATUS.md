@@ -89,3 +89,32 @@ Not yet deployed. `docker-compose.yml` is ready for Postgres + Redis + the app o
 - [ ] Flesh out `services/agent-engine/runAgent.ts` — actual agent execution loop
 - [ ] Flesh out `packages/loop/fixer.ts` and `packages/review/reviewer.ts`
 - [ ] API integration tests (only pure helpers tested so far)
+
+## Categorized work remaining
+
+| Item | Effort | Bucket | Blocker | Priority |
+|------|--------|--------|---------|----------|
+| Rate limiting on `/run` and `/webhook/run` | ~1h | 🟦 Pure code | none — Fastify plugin or @fastify/rate-limit | P2 |
+| Structured logging (replace `console.error`) | ~half day | 🟦 Pure code | none — pino is already a Fastify dep | P2 |
+| Prometheus metrics endpoint | ~half day | 🟦 Pure code | none — prom-client + `/metrics` route | P2 |
+| Distributed tracing (OpenTelemetry) | ~1d | 🟦 Pure code | optional — only if you run multi-service | P3 |
+| Flesh out `services/agent-engine/runAgent.ts` | ~1–2d | 🟦 Pure code | none — actual execution loop using `callLLM` + `logStep` | P1 |
+| Flesh out `packages/loop/fixer.ts` + `review/reviewer.ts` | ~1d | 🟦 Pure code | none | P2 |
+| API integration tests | ~half day | 🟦 Pure code | none — supertest + the Compose Postgres/Redis | P2 |
+| Live e2e smoke against Compose stack | ~2h | 🔑 Needs creds | `OPENAI_API_KEY` + Compose stack running | P1 |
+
+## Release plan
+
+1. **Bounded engineering (in priority order):** flesh out the agent execution loop, add rate limiting + structured logging, write API integration tests.
+2. **Run Compose stack locally:** `docker-compose up -d` → Postgres + Redis come up. Run `pnpm api` and `pnpm worker` against them.
+3. **Smoke test:** `curl -X POST http://localhost:3001/run -d '{"task":"hello"}' -H content-type:application/json` → confirm a row in `agent_runs` and the worker logs a step.
+4. **Deploy:** push the Docker image to your container host (Railway/Fly/your VPS); set the env vars.
+5. **Tag release:** start with `v0.2.0` (was `v0.1.0 — skeleton`); bump to `v1.0.0` once observability + agent engine ship.
+
+### Deploy prerequisites
+- `OPENAI_API_KEY` — required
+- `DATABASE_URL` (Postgres) — from Compose or hosted (Supabase/Neon)
+- `REDIS_HOST`/`REDIS_PORT` — from Compose or hosted (Upstash)
+- `WEBHOOK_API_KEY` — generated (`openssl rand -hex 32`)
+- `PORT` — host's exposed port
+- Container host with both API + worker processes (Compose handles this)
