@@ -11,15 +11,15 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "bullmq": "^4.0.0",
-    "dotenv": "^16.0.0",
-    "fastify": "^4.0.0",
-    "ioredis": "^5.0.0",
-    "openai": "^4.0.0",
-    "pg": "^8.0.0"
+    "bullmq": "^4.18.3",
+    "dotenv": "^16.6.1",
+    "fastify": "^4.29.1",
+    "ioredis": "^5.11.1",
+    "openai": "^4.104.0",
+    "pg": "^8.22.0"
   },
   "devDependencies": {
-    "@types/node": "^24.6.0",
+    "@types/node": "^24.13.3",
     "@types/pg": "^8.20.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
