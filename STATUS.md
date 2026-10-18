@@ -11,7 +11,7 @@
 - Redis queue connection via `ioredis`
 - OpenAI integration in `packages/llm/openai.ts`
 - **Fail-closed webhook auth** — refuses to start without `WEBHOOK_API_KEY`
-- Bearer-token check on `/webhook/run` (`x-api-key` header)
+- `x-api-key` header check on `/run` and `/webhook/run`; the UI prompts for the key once and stores it in localStorage
 - Loop detector: Jaccard similarity ≥ 0.85, case/punctuation insensitive
 - Loop fixer: LLM-driven prompt to break repeated outputs
 - Cost tracker: prompt vs completion token pricing (2× ratio for completion)
