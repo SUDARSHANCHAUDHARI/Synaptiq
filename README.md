@@ -32,7 +32,7 @@ AI agent runs can loop, waste tokens, and fail without clear execution traces. S
 | Runtime | ts-node TypeScript |
 | Queue | Redis + BullMQ |
 | Database | PostgreSQL schema included |
-| Security | Webhook fail-closed without `WEBHOOK_API_KEY`; bearer header check on `/webhook/run` |
+| Security | Webhook fail-closed without `WEBHOOK_API_KEY`; `x-api-key` header check on `/run` and `/webhook/run` (the UI asks for the key once and keeps it in localStorage) |
 | Tests | 11 Vitest unit tests (cost tracker, loop detector) |
 | Remaining | End-to-end smoke against Compose stack; rate limits; observability |
 

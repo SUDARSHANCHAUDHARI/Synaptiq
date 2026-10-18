@@ -133,6 +133,7 @@
     const runsEl = document.getElementById("runs");
     const taskEl = document.getElementById("task");
     const runCountLabelEl = document.getElementById("runCountLabel");
+    const API_KEY_STORAGE = "synaptiq.apiKey";
 
     function setStatus(message, isError = false) {
       statusEl.textContent = message;
@@ -210,13 +211,29 @@
         return;
       }
 
+      let apiKey = localStorage.getItem(API_KEY_STORAGE);
+      if (!apiKey) {
+        apiKey = (prompt("Enter the API key (WEBHOOK_API_KEY) to queue runs:") || "").trim();
+        if (!apiKey) {
+          setStatus("API key is required.", true);
+          return;
+        }
+        localStorage.setItem(API_KEY_STORAGE, apiKey);
+      }
+
       setStatus("Queueing run...");
       try {
         const res = await fetch("/run", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "x-api-key": apiKey },
           body: JSON.stringify({ task })
         });
+        if (res.status === 401) {
+          // Stored key is wrong or rotated: forget it and ask again.
+          localStorage.removeItem(API_KEY_STORAGE);
+          setStatus("Invalid API key.", true);
+          return submitRun();
+        }
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data.error || "Failed to queue run");

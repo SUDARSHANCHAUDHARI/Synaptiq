@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import { readFile } from "node:fs/promises";
+import { createHash, timingSafeEqual } from "node:crypto";
 import path from "node:path";
 import { Queue } from "bullmq";
 import { logStep } from "../../packages/audit/logger";
@@ -37,7 +38,17 @@ const queue = new Queue("agent", {
   }
 });
 
+// Hash both sides so timingSafeEqual gets equal-length inputs and the key length is not leaked.
+function hasValidApiKey(req: any): boolean {
+  const digest = (value: string) => createHash("sha256").update(value).digest();
+  return timingSafeEqual(digest(String(req.headers["x-api-key"] || "").trim()), digest(webhookApiKey));
+}
+
 app.post("/run", async (req: any, reply) => {
+  if (!hasValidApiKey(req)) {
+    return reply.code(401).send({ error: "Invalid API key" });
+  }
+
   const task = String(req.body?.task || "").trim();
   if (!task) {
     return reply.code(400).send({ error: "Task is required" });
@@ -55,13 +66,12 @@ app.post("/run", async (req: any, reply) => {
       ["failed", runId]
     );
     await logStep(runId, "queue", 0, task, message, 0, "failed");
-    return reply.code(500).send({ error: message, runId });
+    return reply.code(500).send({ error: "Failed to queue run", runId });
   }
 });
 
 app.post("/webhook/run", async (req: any, reply) => {
-  const providedKey = String(req.headers["x-api-key"] || "").trim();
-  if (providedKey !== webhookApiKey) {
+  if (!hasValidApiKey(req)) {
     return reply.code(401).send({ error: "Invalid API key" });
   }
 
@@ -82,7 +92,7 @@ app.post("/webhook/run", async (req: any, reply) => {
       ["failed", runId]
     );
     await logStep(runId, "webhook", 0, task, message, 0, "failed");
-    return reply.code(500).send({ error: message, runId });
+    return reply.code(500).send({ error: "Failed to queue run", runId });
   }
 });
 
@@ -153,9 +163,7 @@ app.get("/runs/view/:id", async (_req, reply) => {
 
 app.setErrorHandler((error, req, reply) => {
   req.log.error(error);
-  reply.code(500).send({
-    error: error.message || "Internal server error"
-  });
+  reply.code(500).send({ error: "Internal server error" });
 });
 
 async function startApi() {
