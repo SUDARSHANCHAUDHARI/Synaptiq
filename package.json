@@ -23,7 +23,7 @@
     "@types/pg": "^8.20.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "vitest": "^1.6.1"
+    "vitest": "^3.0.0"
   },
   "license": "MIT",
   "packageManager": "pnpm@10.28.2"
